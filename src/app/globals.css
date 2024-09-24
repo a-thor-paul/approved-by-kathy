@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: #f0f7fe;
+  --color-text: #1b2c50;
+  --color-primary: #3f8ee7;
+  --color-primary-hover: #6bb2ef;
+  --color-secondary: #c4e1f9;
+  --color-secondary-hover: #9bcdf5;
+  --color-link: #3477dc;
+  --color-link-hover: #2b63ca;
+  --color-border: #c4e1f9;
+}
+
+/* You can then use these variables in your Tailwind classes */
+@layer base {
+  body {
+    @apply bg-[var(--color-background)] text-[var(--color-text)];
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] transition duration-300;
+  }
+  .btn-secondary {
+    @apply bg-[var(--color-secondary)] text-[var(--color-text)] hover:bg-[var(--color-secondary-hover)] transition duration-300;
+  }
+}
