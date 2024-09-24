@@ -22,6 +22,7 @@ export default function ApplicationPage() {
   const [errors, setErrors] = useState<{[key: string]: string}>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [consentGiven, setConsentGiven] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -90,24 +91,28 @@ export default function ApplicationPage() {
     }
 
     setIsSubmitting(true)
+    setSubmitStatus('idle')
 
     try {
-      const response = await fetch('/api/submit-application', {
+      const response = await fetch('/__forms.html', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          'form-name': 'loan-application',
+          ...formData,
+          consent: consentGiven.toString()
+        }).toString()
       })
 
       if (response.ok) {
+        setSubmitStatus('success')
         router.push('/thank-you')
       } else {
         throw new Error('Failed to submit application')
       }
     } catch (error) {
       console.error('Error submitting application:', error)
-      alert('There was an error submitting your application. Please try again.')
+      setSubmitStatus('error')
     } finally {
       setIsSubmitting(false)
     }
@@ -117,7 +122,7 @@ export default function ApplicationPage() {
     <div className="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">Loan Application</h1>
-        <form onSubmit={handleSubmit} className="space-y-6" data-netlify="true" name="loan-application">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <input type="hidden" name="form-name" value="loan-application" />
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {Object.entries(formData).map(([key, value]) => (
@@ -176,6 +181,11 @@ export default function ApplicationPage() {
             </button>
           </div>
         </form>
+        {submitStatus === 'error' && (
+          <div className="mt-4 text-red-600 text-center">
+            There was an error submitting your application. Please try again.
+          </div>
+        )}
       </div>
     </div>
   )
